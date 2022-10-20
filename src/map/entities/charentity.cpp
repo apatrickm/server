@@ -50,6 +50,7 @@
 #include "../ai/states/ability_state.h"
 #include "../ai/states/attack_state.h"
 #include "../ai/states/death_state.h"
+#include "../ai/states/inactive_state.h"
 #include "../ai/states/item_state.h"
 #include "../ai/states/magic_state.h"
 #include "../ai/states/raise_state.h"
@@ -58,6 +59,7 @@
 
 #include "../ability.h"
 #include "../attack.h"
+#include "../battlefield.h"
 #include "../char_recast_container.h"
 #include "../conquest_system.h"
 #include "../item_container.h"
@@ -900,6 +902,12 @@ void CCharEntity::OnDisengage(CAttackState& state)
 bool CCharEntity::CanAttack(CBattleEntity* PTarget, std::unique_ptr<CBasicPacket>& errMsg)
 {
     TracyZoneScoped;
+
+    if (PTarget->PAI->IsUntargetable())
+    {
+        return false;
+    }
+
     float dist = distance(loc.p, PTarget->loc.p);
 
     if (!IsMobOwner(PTarget))
@@ -1012,14 +1020,14 @@ void CCharEntity::OnCastFinished(CMagicState& state, action_t& action)
     }
 }
 
-void CCharEntity::OnCastInterrupted(CMagicState& state, action_t& action, MSGBASIC_ID msg)
+void CCharEntity::OnCastInterrupted(CMagicState& state, action_t& action, MSGBASIC_ID msg, bool blockedCast)
 {
     TracyZoneScoped;
-    CBattleEntity::OnCastInterrupted(state, action, msg);
+    CBattleEntity::OnCastInterrupted(state, action, msg, blockedCast);
 
     auto* message = state.GetErrorMsg();
 
-    if (message)
+    if (message && action.actiontype != ACTION_MAGIC_INTERRUPT) // Interrupt is handled elsewhere
     {
         pushPacket(message);
     }
@@ -1057,6 +1065,25 @@ void CCharEntity::OnWeaponSkillFinished(CWeaponSkillState& state, action_t& acti
         else
         {
             PAI->TargetFind->findSingleTarget(PBattleTarget);
+        }
+
+        // Assumed, it's very difficult to produce this due to WS being nearly instant
+        // TODO: attempt to verify.
+        if (PAI->TargetFind->m_targets.size() == 0)
+        {
+            // No targets, perhaps something like Super Jump or otherwise untargetable
+            action.actiontype         = ACTION_MAGIC_FINISH;
+            action.actionid           = 28787; // Some hardcoded magic for interrupts
+            actionList_t& actionList  = action.getNewActionList();
+            actionList.ActionTargetID = id;
+
+            actionTarget_t& actionTarget = actionList.getNewActionTarget();
+
+            actionTarget.animation = 0x1FC; // Assumed, but not verified.
+            actionTarget.messageID = 0;
+            actionTarget.reaction  = REACTION::ABILITY | REACTION::HIT;
+
+            return;
         }
 
         for (auto&& PTarget : PAI->TargetFind->m_targets)
@@ -1203,7 +1230,17 @@ void CCharEntity::OnAbility(CAbilityState& state, action_t& action)
         pushPacket(new CMessageBasicPacket(this, this, 0, 0, MSGBASIC_UNABLE_TO_USE_JA2));
         return;
     }
-    auto*                         PTarget = static_cast<CBattleEntity*>(state.GetTarget());
+
+    auto* PTarget = static_cast<CBattleEntity*>(state.GetTarget());
+    PAI->TargetFind->reset();
+    PAI->TargetFind->findSingleTarget(PTarget);
+
+    // Check if target is untargetable
+    if (PAI->TargetFind->m_targets.size() == 0)
+    {
+        return;
+    }
+
     std::unique_ptr<CBasicPacket> errMsg;
     if (IsValidTarget(PTarget->targid, PAbility->getValidTarget(), errMsg))
     {
@@ -1230,8 +1267,7 @@ void CCharEntity::OnAbility(CAbilityState& state, action_t& action)
 
         if (battleutils::IsParalyzed(this))
         {
-            // display paralyzed
-            loc.zone->PushPacket(this, CHAR_INRANGE_SELF, new CMessageBasicPacket(this, PTarget, 0, 0, MSGBASIC_IS_PARALYZED));
+            setActionInterrupted(action, PTarget, MSGBASIC_IS_PARALYZED, 0);
             return;
         }
 
@@ -1882,23 +1918,26 @@ void CCharEntity::OnRaise()
 
         loc.zone->PushPacket(this, CHAR_INRANGE_SELF, new CActionPacket(action));
 
-        uint8  mLevel  = (m_LevelRestriction != 0 && m_LevelRestriction < GetMLevel()) ? m_LevelRestriction : GetMLevel();
-        uint16 expLost = mLevel <= 67 ? (charutils::GetExpNEXTLevel(mLevel) * 8) / 100 : 2400;
+        uint8 mLevel = charutils::GetCharVar(this, "DeathLevel");
 
-        uint16 xpNeededToLevel = charutils::GetExpNEXTLevel(jobs.job[GetMJob()]) - jobs.exp[GetMJob()];
-
-        // Exp is enough to level you and (you're not under a level restriction, or the level restriction is higher than your current main level).
-        if (xpNeededToLevel < expLost && (m_LevelRestriction == 0 || GetMLevel() < m_LevelRestriction))
+        // Do not return EXP to the player if they do not have a level at death set
+        if (mLevel != 0)
         {
-            // Player probably leveled down when they died.  Give they xp for the next level.
-            expLost = GetMLevel() <= 67 ? (charutils::GetExpNEXTLevel(jobs.job[GetMJob()] + 1) * 8) / 100 : 2400;
-        }
+            uint16 expLost = mLevel <= 67 ? (charutils::GetExpNEXTLevel(mLevel) * 8) / 100 : 2400;
 
-        uint16 xpReturned = (uint16)(ceil(expLost * ratioReturned));
+            uint16 xpNeededToLevel = charutils::GetExpNEXTLevel(jobs.job[GetMJob()]) - jobs.exp[GetMJob()];
 
-        if (GetLocalVar("MijinGakure") == 0 && GetMLevel() >= settings::get<uint8>("map.EXP_LOSS_LEVEL"))
-        {
+            // Exp is enough to level you and (you're not under a level restriction, or the level restriction is higher than your current main level).
+            if (xpNeededToLevel < expLost && (m_LevelRestriction == 0 || GetMLevel() < m_LevelRestriction))
+            {
+                // Player probably leveled down when they died.  Give they xp for the next level.
+                expLost = GetMLevel() <= 67 ? (charutils::GetExpNEXTLevel(jobs.job[GetMJob()] + 1) * 8) / 100 : 2400;
+            }
+
+            uint16 xpReturned = (uint16)(ceil(expLost * ratioReturned));
             charutils::AddExperiencePoints(true, this, this, xpReturned);
+
+            charutils::SetCharVar(this, "DeathLevel", 0);
         }
 
         // If Arise was used then apply a reraise 3 effect on the target
@@ -2042,8 +2081,14 @@ void CCharEntity::Die()
     // influence for conquest system
     conquest::LoseInfluencePoints(this);
 
-    if (GetLocalVar("MijinGakure") == 0)
+    if (GetLocalVar("MijinGakure") == 0 &&
+        (PBattlefield == nullptr || (PBattlefield->GetRuleMask() & RULES_LOSE_EXP) == RULES_LOSE_EXP) &&
+        GetMLevel() >= settings::get<uint8>("map.EXP_LOSS_LEVEL"))
     {
+        // Track what level the player died at to properly give EXP back on raise
+        int32 level = (m_LevelRestriction > 0 && m_LevelRestriction < GetMLevel()) ? m_LevelRestriction : GetMLevel();
+        charutils::SetCharVar(this, "DeathLevel", level);
+
         float retainPercent = std::clamp(settings::get<uint8>("map.EXP_RETAIN") + getMod(Mod::EXPERIENCE_RETAINED) / 100.0f, 0.0f, 1.0f);
         charutils::DelExperiencePoints(this, retainPercent, 0);
     }

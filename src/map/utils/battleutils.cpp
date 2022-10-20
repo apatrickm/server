@@ -3415,7 +3415,7 @@ namespace battleutils
 
     bool IsParalyzed(CBattleEntity* PAttacker)
     {
-        return (xirand::GetRandomNumber(100) < std::clamp(PAttacker->getMod(Mod::PARALYZE) - PAttacker->getMod(Mod::PARALYZERES), 0, 100));
+        return (xirand::GetRandomNumber(100) < PAttacker->getMod(Mod::PARALYZE));
     }
 
     /************************************************************************
@@ -5339,7 +5339,7 @@ namespace battleutils
         {
             damage = -damage;
         }
-        else if (xirand::GetRandomNumber(100) < PDefender->getMod(Mod::NULL_PHYSICAL_DAMAGE))
+        else if (xirand::GetRandomNumber(100) < PDefender->getMod(Mod::NULL_RANGED_DAMAGE))
         {
             damage = 0;
         }
