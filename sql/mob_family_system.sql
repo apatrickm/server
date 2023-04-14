@@ -42,7 +42,7 @@ CREATE TABLE `mob_family_system` (
   `detects` smallint(5) NOT NULL DEFAULT 0,
   `charmable` tinyint(2) NOT NULL DEFAULT 0,
   PRIMARY KEY (`familyID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=128;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 AVG_ROW_LENGTH=128;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,7 +180,7 @@ INSERT INTO `mob_family_system` VALUES (128,'Gigas',74,'Gigas',7,'Beastmen',1,40
 INSERT INTO `mob_family_system` VALUES (129,'Gigas',74,'Gigas',7,'Beastmen',1,40,125,100,1,2,1,5,6,4,3,1,3,1,3,2,1,0);
 INSERT INTO `mob_family_system` VALUES (130,'Gigas',74,'Gigas',7,'Beastmen',1,40,125,100,1,2,1,5,6,4,3,1,3,1,3,2,1,0);
 INSERT INTO `mob_family_system` VALUES (131,'Gnat',75,'Gnat',20,'Vermin',0,40,90,120,4,1,4,2,3,6,6,1,3,1,3,8,1,0);
-INSERT INTO `mob_family_system` VALUES (132,'Gnole',76,'Gnole',7,'Beastmen',1,40,120,90,3,2,1,6,6,4,5,1,3,1,3,8,257,0);
+INSERT INTO `mob_family_system` VALUES (132,'Gnole',76,'Gnole',6,'Beast',1,40,120,90,3,2,1,6,6,4,5,1,3,1,3,8,257,0);
 INSERT INTO `mob_family_system` VALUES (133,'Goblin',77,'Goblin',7,'Beastmen',0,40,91,120,1,3,5,3,4,4,4,1,3,1,3,1,1,0);
 INSERT INTO `mob_family_system` VALUES (134,'God',78,'Supreme_Being',0,'Unclassified',3,40,120,140,1,1,1,1,1,1,1,1,1,1,1,0,3,0);
 INSERT INTO `mob_family_system` VALUES (135,'Golem',79,'Golem',3,'Arcana',1,40,130,130,2,3,3,5,3,6,5,1,2,1,3,7,33,0);
@@ -530,6 +530,7 @@ INSERT INTO `mob_family_system` VALUES (503,'Mammet',86,'Humanoid',3,'Arcana',0,
 INSERT INTO `mob_family_system` VALUES (504,'Luopan',0,'undefined',0,'Unclassified',0,40,150,120,1,3,4,3,3,3,4,1,5,1,3,0,2,0);
 INSERT INTO `mob_family_system` VALUES (505,'Fungi',0,'undefined',0,'Unclassified',0,0,130,180,1,3,4,3,6,6,5,1,3,1,3,4,2,0);
 INSERT INTO `mob_family_system` VALUES (506,'Meeble',189,'Meeble',7,'Beastmen',0,40,125,90,3,2,5,2,6,4,5,1,2,1,3,5,1,0);
+INSERT INTO `mob_family_system` VALUES (507,'Quasilumin',15,'Luminian',0,'Unclassified',1,25,100,100,5,5,5,5,5,5,5,5,5,5,5,0,2,0);
 
 INSERT INTO `mob_family_system` VALUES (411,'Pet-Siren',16,'Siren',5,'Avatar',0,40,100,120,3,3,3,3,3,3,3,1,3,1,3,0,41,0);
 

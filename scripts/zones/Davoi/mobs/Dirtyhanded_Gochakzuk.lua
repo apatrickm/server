@@ -8,11 +8,11 @@ local entity = {}
 
 entity.onMobInitialize = function(mob)
     mob:addMod(xi.mod.FASTCAST, 70)
-    mob:setMod(xi.mod.SILENCERES, 75)
-    mob:setMod(xi.mod.SLEEPRES, 75)
+    mob:setMod(xi.mod.SILENCE_MEVA, 75)
+    mob:setMod(xi.mod.SLEEP_MEVA, 75)
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
 end
 
 return entity

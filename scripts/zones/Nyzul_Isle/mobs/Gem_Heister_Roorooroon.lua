@@ -58,10 +58,14 @@ local function dropBomb(mob)
 
     if target ~= nil then
         bombMob:updateEnmity(target)
-        bombMob:timer(1000, function(bomb) bomb:useMobAbility(1838) end)
+        bombMob:timer(1000, function(bomb)
+            bomb:useMobAbility(1838)
+        end)
     end
 
-    bombMob:timer(4500, function(bomb) bomb:setStatus(xi.status.DISAPPEAR) end)
+    bombMob:timer(4500, function(bomb)
+        bomb:setStatus(xi.status.DISAPPEAR)
+    end)
 end
 
 entity.onMobSpawn = function(mob)
@@ -70,7 +74,7 @@ entity.onMobSpawn = function(mob)
     SpawnMob(mob:getID() + 1, instance)
 end
 
-entity.onMobEngaged= function(mob, target)
+entity.onMobEngaged = function(mob, target)
     mob:setLocalVar("runTime", math.random(10, 25))
 end
 
@@ -96,8 +100,8 @@ entity.onMobFight = function(mob, target)
     end
 end
 
-entity.onMobDeath = function(mob, player, isKiller, noKiller)
-    if isKiller or noKiller then
+entity.onMobDeath = function(mob, player, optParams)
+    if optParams.isKiller or optParams.noKiller then
         xi.nyzul.spawnChest(mob, player)
         xi.nyzul.enemyLeaderKill(mob)
     end

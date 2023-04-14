@@ -14,11 +14,11 @@ entity.onMobEngaged = function(mob, player)
     mob:setLocalVar("[uragnite]inShellRegen", 100)
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
 end
 
 entity.onMobDespawn = function(mob)
-    mob:getLocalVar("respawn", os.time() + 43200) -- 12 hour respawn
+    mob:setLocalVar("respawn", os.time() + 43200) -- 12 hour respawn
 end
 
 return entity

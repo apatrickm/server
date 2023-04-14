@@ -12,10 +12,7 @@ entity.onMobInitialize = function(mob)
     mob:setMobMod(xi.mobMod.IDLE_DESPAWN, 180)
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
-    if player:getCharVar("TransformationsProgress") == 4 then
-        player:setCharVar("TransformationsProgress", 5)
-    end
+entity.onMobDeath = function(mob, player, optParams)
 end
 
 return entity

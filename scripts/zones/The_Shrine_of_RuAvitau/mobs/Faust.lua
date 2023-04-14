@@ -33,6 +33,7 @@ local handleFaustFacingDirectionMechanics = function(faust)
         else
             setFaustFacingDirection(faust, north)
         end
+
         setFaustNextTurnTime(faust)
     end
 end
@@ -50,7 +51,7 @@ entity.onMobRoam = function(mob)
     end
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
 end
 
 entity.onMobDespawn = function(mob)

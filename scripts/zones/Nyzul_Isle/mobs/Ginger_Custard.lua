@@ -11,7 +11,7 @@ local entity = {}
 
 entity.onMobInitialize = function(mob)
     mob:setMod(xi.mod.FIRE_ABSORB, 100)
-    mob:setMod(xi.mod.SILENCERES, 80)
+    mob:setMod(xi.mod.SILENCE_MEVA, 80)
 end
 
 entity.onMobFight = function(mob, target)
@@ -23,8 +23,8 @@ entity.onMobFight = function(mob, target)
     end
 end
 
-entity.onMobDeath = function(mob, player, isKiller, noKiller)
-    if isKiller or noKiller then
+entity.onMobDeath = function(mob, player, optParams)
+    if optParams.isKiller or optParams.noKiller then
         xi.nyzul.spawnChest(mob, player)
         xi.nyzul.enemyLeaderKill(mob)
     end

@@ -21,11 +21,11 @@
 
 #include <utility>
 
-#include "../common/logging.h"
-#include "../common/taskmgr.h"
-#include "../common/timer.h"
-#include "../common/tracy.h"
-#include "../common/utils.h"
+#include "common/logging.h"
+#include "common/taskmgr.h"
+#include "common/timer.h"
+#include "common/tracy.h"
+#include "common/utils.h"
 
 CTaskMgr* CTaskMgr::_instance = nullptr;
 
@@ -43,8 +43,7 @@ void CTaskMgr::delInstance()
 {
     if (_instance)
     {
-        delete _instance;
-        _instance = nullptr;
+        destroy(_instance);
     }
 }
 
@@ -131,11 +130,10 @@ duration CTaskMgr::DoTimer(time_point tick)
             case TASK_REMOVE:
             default:
             {
-                delete PTask; // suppose that all tasks were allocated by new
+                destroy(PTask); // suppose that all tasks were allocated by new
             }
             break;
         }
-        diff = std::clamp<duration>(diff, 50ms, 1000ms);
     }
-    return diff;
+    return std::clamp<duration>(diff, 50ms, 1000ms);
 }

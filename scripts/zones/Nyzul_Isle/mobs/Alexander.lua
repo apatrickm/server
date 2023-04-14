@@ -57,14 +57,14 @@ entity.onMobFight = function(mob, target)
 
     -- ffxiclopedia: "In addition to this, it's possible he'll use it several times again at low (5%?) HP."
     -- Per same wiki, may use Perfect Defense as a regular skill at 10%..Assuming same % for both skills.
-    local skill_list = mob:getMobMod(xi.mobMod.SKILL_LIST)
-    if mob:getHPP() <= 10 and skill_list == 784 then
+    local skillList = mob:getMobMod(xi.mobMod.SKILL_LIST)
+    if mob:getHPP() <= 10 and skillList == 784 then
         mob:setMobMod(xi.mobMod.SKILL_LIST, 785)
     end
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
-    if isKiller then
+entity.onMobDeath = function(mob, player, optParams)
+    if optParams.isKiller then
         mob:showText(mob, ID.text.SHALL_KNOW_OBLIVION)
     end
 end

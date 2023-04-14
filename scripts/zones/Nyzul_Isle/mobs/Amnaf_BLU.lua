@@ -71,7 +71,6 @@ entity.onMobEngaged = function(mob, target)
         gear:updateEnmity(target)
         gear:setLocalVar("Form2Gears", 1)
     end
-
 end
 
 entity.onMobFight = function(mob, target)
@@ -111,7 +110,7 @@ entity.onSpellPrecast = function(mob, spell)
     end
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
 end
 
 entity.onMobDespawn = function(mob)

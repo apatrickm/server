@@ -90,6 +90,8 @@ enum MOGHANCEMENT_TYPE
     MOGLIFICATION_EXPERIENCE_BOOST = 562, // Increases the rate of gaining experience by 15%
     MOGLIFICATION_CAPACITY_BOOST   = 563, // Increases the rate of gaining capacity points by 15%
 
+    MOGLIFICATION_RESIST_DEATH         = 566,  // Slightly improves your resistance to death effects
+    MOGLIFICATION_RESIST_SLEEP         = 2848, // Slightly improves your resistance to sleep effects
     MOGLIFICATION_RESIST_POISON        = 2849, // Slightly improves your resistance to poison effects
     MOGLIFICATION_RESIST_PARALYSIS     = 2850, // Slightly improves your resistance to paralysis effects
     MOGLIFICATION_RESIST_SILENCE       = 2852, // Slightly improves your resistance to silence effects
@@ -127,6 +129,16 @@ public:
     void setLevel(uint8 level);
     void setRotation(uint8 rotation);
     void setOrder(uint8 order);
+
+    void  setMannequinRace(uint8 race);
+    uint8 getMannequinRace();
+    void  setMannequinPose(uint8 pose);
+    uint8 getMannequinPose();
+
+    void setOn2ndFloor(bool on2ndFloor);
+    bool getOn2ndFloor();
+
+    bool isGardeningPot();
 
 private:
     uint8  m_storage;

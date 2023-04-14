@@ -11,9 +11,9 @@ local entity = {}
 
 entity.onMobInitialize = function(mob)
     mob:setMobMod(xi.mobMod.ADD_EFFECT, 1)
-    mob:setMod(xi.mod.SLEEPRES, 90)
-    mob:setMod(xi.mod.PARALYZERES, 75)
-    mob:setMod(xi.mod.SILENCERES, 75)
+    mob:setMod(xi.mod.SLEEP_MEVA, 90)
+    mob:setMod(xi.mod.PARALYZE_MEVA, 75)
+    mob:setMod(xi.mod.SILENCE_MEVA, 75)
 end
 
 entity.onMobEngaged = function(mob, target)
@@ -24,9 +24,9 @@ entity.onAdditionalEffect = function(mob, target, damage)
     return xi.mob.onAddEffect(mob, target, damage, xi.mob.ae.TP_DRAIN, { chance = 35, power = math.random(95, 135) })
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
     player:addTitle(xi.title.OVERLORD_OVERTHROWER)
-    if isKiller then
+    if optParams.isKiller then
         mob:showText(mob, ID.text.ORC_KING_DEATH)
     end
 end

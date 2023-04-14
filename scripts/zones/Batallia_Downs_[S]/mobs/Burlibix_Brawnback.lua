@@ -8,10 +8,10 @@ require("scripts/globals/status")
 local entity = {}
 
 entity.onMobSpawn = function(mob)
-    mob:addMod(xi.mod.STUNRES, 50)
+    mob:addMod(xi.mod.STUN_MEVA, 50)
 end
 
-entity.onMobDeath = function(mob, player, isKiller)
+entity.onMobDeath = function(mob, player, optParams)
     xi.hunts.checkHunt(mob, player, 494)
 end
 
