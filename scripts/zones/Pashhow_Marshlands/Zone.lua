@@ -26,7 +26,11 @@ end
 zoneObject.onZoneIn = function(player, prevZone)
     local cs = -1
 
-    if player:getXPos() == 0 and player:getYPos() == 0 and player:getZPos() == 0 then
+    if
+        player:getXPos() == 0 and
+        player:getYPos() == 0 and
+        player:getZPos() == 0
+    then
         player:setPos(547.841, 23.192, 696.323, 136)
     end
 
@@ -46,7 +50,29 @@ zoneObject.onConquestUpdate = function(zone, updatetype)
     xi.conq.onConquestUpdate(zone, updatetype)
 end
 
-zoneObject.onRegionEnter = function(player, region)
+zoneObject.onTriggerAreaEnter = function(player, triggerArea)
+end
+
+zoneObject.onZoneWeatherChange = function(weather)
+    local toxicTamlyn = GetMobByID(ID.mob.TOXIC_TAMLYN)
+    local currentTime = os.time()
+
+    if toxicTamlyn:isSpawned() then
+        if
+            weather ~= xi.weather.RAIN and
+            weather ~= xi.weather.SQUALL
+        then
+            DespawnMob(ID.mob.TOXIC_TAMLYN)
+            toxicTamlyn:setLocalVar("spawnTime", currentTime + 3600) -- 1 hour
+        end
+    else
+        if
+            (weather == xi.weather.RAIN or weather == xi.weather.SQUALL) and
+            toxicTamlyn:getLocalVar("spawnTime") < currentTime
+        then
+            SpawnMob(ID.mob.TOXIC_TAMLYN)
+        end
+    end
 end
 
 zoneObject.onEventUpdate = function(player, csid, option)
@@ -55,7 +81,7 @@ zoneObject.onEventUpdate = function(player, csid, option)
     end
 end
 
-zoneObject.onEventFinish = function( player, csid, option)
+zoneObject.onEventFinish = function(player, csid, option, npc)
 end
 
 return zoneObject

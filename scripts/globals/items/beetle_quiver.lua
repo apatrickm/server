@@ -3,6 +3,7 @@
 -- Item: Beetle Quiver
 -- When used, you will obtain one stack of Beetle Arrows
 -----------------------------------
+require("scripts/globals/items")
 require("scripts/globals/msg")
 -----------------------------------
 local itemObject = {}
@@ -12,11 +13,12 @@ itemObject.onItemCheck = function(target)
     if target:getFreeSlotsCount() == 0 then
         result = xi.msg.basic.ITEM_NO_USE_INVENTORY
     end
+
     return result
 end
 
 itemObject.onItemUse = function(target)
-    target:addItem(18154, 99)
+    target:addItem(xi.items.BEETLE_ARROW, 99)
 end
 
 return itemObject

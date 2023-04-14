@@ -77,7 +77,7 @@ public:
     bool Internal_Die(duration);
     bool Internal_Raise();
     bool Internal_UseItem(uint16 targetid, uint8 loc, uint8 slotid);
-    bool Internal_Despawn();
+    bool Internal_Despawn(bool instantDespawn = false);
     bool Internal_Respawn(duration _duration);
 
     void    Reset();
@@ -122,6 +122,7 @@ public:
 
     void QueueAction(queueAction_t&&);
     bool QueueEmpty();
+    void checkQueueImmediately();
 
     // stores all events and their associated lua callbacks
     CAIEventHandler              EventHandler;

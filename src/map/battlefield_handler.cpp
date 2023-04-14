@@ -77,7 +77,7 @@ void CBattlefieldHandler::HandleBattlefields(time_point tick)
             {
                 it = m_Battlefields.erase(it);
                 ShowDebug("[CBattlefieldHandler]HandleBattlefields cleaned up Battlefield %s", PBattlefield->GetName().c_str());
-                delete PBattlefield;
+                destroy(PBattlefield);
                 continue;
             }
         }
@@ -98,7 +98,7 @@ void CBattlefieldHandler::HandleBattlefields(time_point tick)
         {
             luautils::OnBattlefieldKick(PChar);
             PChar->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_CONFRONTATION, true);
-            PChar->StatusEffectContainer->DelStatusEffect(EFFECT_LEVEL_RESTRICTION);
+            m_PZone->updateCharLevelRestriction(PChar);
         }
         iter = m_orphanedPlayers.erase(iter);
     }
@@ -178,6 +178,12 @@ uint8 CBattlefieldHandler::LoadBattlefield(CCharEntity* PChar, const Battlefield
             PBattlefield->SetLocalVar("loot", lootid);
         }
 
+        if (!PChar->StatusEffectContainer->GetStatusEffect(EFFECT_BATTLEFIELD))
+        {
+            PChar->StatusEffectContainer->AddStatusEffect(
+                new CStatusEffect(EFFECT_BATTLEFIELD, EFFECT_BATTLEFIELD, PBattlefield->GetID(), 0, 0, PChar->id, PBattlefield->GetArea()), true);
+        }
+
         luautils::OnBattlefieldRegister(PChar, PBattlefield);
         luautils::OnBattlefieldInitialise(PBattlefield);
         PBattlefield->InsertEntity(PChar, true);
@@ -214,6 +220,12 @@ uint8 CBattlefieldHandler::LoadBattlefield(CCharEntity* PChar, const Battlefield
     PBattlefield->m_showTimer = registration.showTimer;
 
     m_Battlefields.insert(std::make_pair(PBattlefield->GetArea(), PBattlefield));
+
+    if (!PChar->StatusEffectContainer->GetStatusEffect(EFFECT_BATTLEFIELD))
+    {
+        PChar->StatusEffectContainer->AddStatusEffect(
+            new CStatusEffect(EFFECT_BATTLEFIELD, EFFECT_BATTLEFIELD, PBattlefield->GetID(), 0, 0, PChar->id, PBattlefield->GetArea()), true);
+    }
 
     luautils::OnBattlefieldRegister(PChar, PBattlefield);
     luautils::OnBattlefieldInitialise(PBattlefield);

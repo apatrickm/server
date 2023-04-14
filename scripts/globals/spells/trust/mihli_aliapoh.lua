@@ -16,7 +16,6 @@ spellObject.onMagicCastingCheck = function(caster, target, spell)
 end
 
 spellObject.onSpellCast = function(caster, target, spell)
-
     -- Records of Eminence: Alter Ego: Mihli Aliapoh
     if caster:getEminenceProgress(934) then
         xi.roe.onRecordTrigger(caster, 934)
@@ -63,7 +62,7 @@ spellObject.onMobSpawn = function(mob)
     mob:addListener("WEAPONSKILL_USE", "MIHLI_ALIAPOH_WEAPONSKILL_USE", function(mobArg, target, wsid, tp, action)
         if wsid == 3203 then -- Scouring Bubbles
         -- Bah! Guess I'll pull out another one of my trrricks!
-            if math.random(100) <= 33 then
+            if math.random(1, 100) <= 33 then
                 xi.trust.message(mobArg, xi.trust.message_offset.SPECIAL_MOVE_1)
             end
         end

@@ -11,7 +11,7 @@ local instanceObject = {}
 
 instanceObject.registryRequirements = function(player)
     return player:hasKeyItem(xi.ki.WATERWAY_FACILITY_CRANK) and
-           player:getMissionStatus(xi.mission.log_id.SOA) == 2
+        player:getMissionStatus(xi.mission.log_id.SOA) == 2
 end
 
 instanceObject.entryRequirements = function(player)
@@ -52,7 +52,6 @@ instanceObject.onInstanceCreated = function(instance)
     -- This causes skillchains to happen on players so take care.
     -- Alter Ego Trusts may be summoned in this fight.
     -- At 119 this fight is not a problem with 5 Trusts.
-
 end
 
 instanceObject.onInstanceCreatedCallback = function(player, instance)

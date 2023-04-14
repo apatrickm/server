@@ -1338,6 +1338,7 @@ void CBattleEntity::Spawn()
     HideName(false);
     CBaseEntity::Spawn();
     m_OwnerID.clean();
+    setBattleID(0);
 }
 
 void CBattleEntity::Die()
@@ -1439,6 +1440,7 @@ void CBattleEntity::OnCastFinished(CMagicState& state, action_t& action)
     auto totalTargets = (uint16)PAI->TargetFind->m_targets.size();
 
     PSpell->setTotalTargets(totalTargets);
+    PSpell->setPrimaryTargetID(PActionTarget->id);
 
     action.id         = id;
     action.actiontype = ACTION_MAGIC_FINISH;
@@ -1501,15 +1503,10 @@ void CBattleEntity::OnCastFinished(CMagicState& state, action_t& action)
                 msg = PSpell->getAoEMessage();
             }
 
-            if (damage < 0)
-            {
-                msg                = MSGBASIC_MAGIC_RECOVERS_HP;
-                actionTarget.param = static_cast<uint16>(std::clamp(damage * -1, 0, PTarget->GetMaxHP() - PTarget->health.hp));
-            }
-            else
-            {
-                actionTarget.param = damage;
-            }
+            actionTarget.modifier = PSpell->getModifier();
+            PSpell->setModifier(MODIFIER::NONE); // Reset modifier on use
+
+            actionTarget.param = damage;
         }
 
         if (actionTarget.animation == 122)
@@ -1692,7 +1689,6 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
     }
 
     battleutils::ClaimMob(PTarget, this); // Mobs get claimed whether or not your attack actually is intimidated/paralyzed
-    this->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_ATTACK | EFFECTFLAG_DETECTABLE);
     PTarget->LastAttacked = server_clock::now();
 
     if (battleutils::IsParalyzed(this))
@@ -1745,21 +1741,22 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
         else if ((xirand::GetRandomNumber(100) < attack.GetHitRate() || attackRound.GetSATAOccured()) &&
                  !PTarget->StatusEffectContainer->HasStatusEffect(EFFECT_ALL_MISS))
         {
-            // attack hit, try to be absorbed by shadow unless it is a SATA attack round
-            if (!(attackRound.GetSATAOccured()) && battleutils::IsAbsorbByShadow(PTarget))
-            {
-                actionTarget.messageID = MSGBASIC_SHADOW_ABSORB;
-                actionTarget.param     = 1;
-                actionTarget.reaction  = REACTION::EVADE;
-                attack.SetEvaded(true);
-            }
-            else if (attack.IsParried())
+            // Check parry.
+            if (attack.IsParried())
             {
                 actionTarget.messageID  = 70;
                 actionTarget.reaction   = REACTION::PARRY | REACTION::HIT;
                 actionTarget.speceffect = SPECEFFECT::NONE;
                 battleutils::HandleTacticalParry(PTarget);
                 battleutils::HandleIssekiganEnmityBonus(PTarget, this);
+            }
+            // Try to be absorbed by shadow unless it is a SATA attack round.
+            else if (!(attackRound.GetSATAOccured()) && battleutils::IsAbsorbByShadow(PTarget))
+            {
+                actionTarget.messageID = MSGBASIC_SHADOW_ABSORB;
+                actionTarget.param     = 1;
+                actionTarget.reaction  = REACTION::EVADE;
+                attack.SetEvaded(true);
             }
             else if (attack.CheckAnticipated() || attack.CheckCounter())
             {
@@ -1981,11 +1978,13 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
         }
     }
 
-    PAI->EventHandler.triggerListener("ATTACK", CLuaBaseEntity(this), CLuaBaseEntity(PTarget), &action);
-    PTarget->PAI->EventHandler.triggerListener("ATTACKED", CLuaBaseEntity(PTarget), CLuaBaseEntity(this), &action);
+    PAI->EventHandler.triggerListener("ATTACK", CLuaBaseEntity(this), CLuaBaseEntity(PTarget), CLuaAction(&action));
+    PTarget->PAI->EventHandler.triggerListener("ATTACKED", CLuaBaseEntity(PTarget), CLuaBaseEntity(this), CLuaAction(&action));
     /////////////////////////////////////////////////////////////////////////////////////////////
     // End of attack loop
     /////////////////////////////////////////////////////////////////////////////////////////////
+
+    this->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_ATTACK | EFFECTFLAG_DETECTABLE);
 
     return true;
 }
@@ -2030,6 +2029,16 @@ void CBattleEntity::SetBattleStartTime(time_point time)
 duration CBattleEntity::GetBattleTime()
 {
     return server_clock::now() - m_battleStartTime;
+}
+
+void CBattleEntity::setBattleID(uint16 battleID)
+{
+    m_battleID = battleID;
+}
+
+uint16 CBattleEntity::getBattleID()
+{
+    return m_battleID;
 }
 
 void CBattleEntity::Tick(time_point /*unused*/)

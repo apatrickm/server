@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `item_latents` (
   `latentId` smallint(5) NOT NULL,
   `latentParam` smallint(5) NOT NULL,
   PRIMARY KEY (`itemId`,`modId`,`value`,`latentId`,`latentParam`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=13 PACK_KEYS=1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 AVG_ROW_LENGTH=13 PACK_KEYS=1;
 
 -- INSERT INTO `item_latents` VALUES (itemID,modId,modValue,latentId,latentParam);
 
@@ -433,7 +433,7 @@ INSERT INTO `item_latents` VALUES (13294,233,3,2,75);    -- Enhances "Dragon Kil
 INSERT INTO `item_latents` VALUES (13294,234,3,2,75);    -- Enhances "Demon Killer" effect while HP <=75% and TP <=100%
 INSERT INTO `item_latents` VALUES (13294,235,3,2,75);    -- Enhances "Empty Killer" effect while HP <=75% and TP <=100%
 INSERT INTO `item_latents` VALUES (13294,236,3,2,75);    -- Enhances "Humanoid Killer" effect while HP <=75% and TP <=100%
-INSERT INTO `item_latents` VALUES (13294,237,3,2,75);    -- Enhances "Lumorian Killer" effect while HP <=75% and TP <=100%
+INSERT INTO `item_latents` VALUES (13294,237,3,2,75);    -- Enhances "Luminian Killer" effect while HP <=75% and TP <=100%
 INSERT INTO `item_latents` VALUES (13294,238,3,2,75);    -- Enhances "Luminion Killer" effect while HP <=75% and TP <=100%
 
 -- -------------------------------------------------------

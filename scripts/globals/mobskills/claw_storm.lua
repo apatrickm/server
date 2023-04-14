@@ -18,7 +18,6 @@ mobskillObject.onMobSkillCheck = function(target, mob, skill)
 end
 
 mobskillObject.onMobWeaponSkill = function(target, mob, skill)
-
     local numhits = 3
     local accmod = 1
     local dmgmod = 1.1
@@ -28,7 +27,7 @@ mobskillObject.onMobWeaponSkill = function(target, mob, skill)
 
     local typeEffect = xi.effect.POISON
 
-    xi.mobskills.mobPhysicalStatusEffectMove(mob, target, skill, typeEffect, mob:getMainLvl()/2.5, 3, 30)
+    xi.mobskills.mobPhysicalStatusEffectMove(mob, target, skill, typeEffect, mob:getMainLvl() / 2.5, 3, 30)
 
     return dmg
 end

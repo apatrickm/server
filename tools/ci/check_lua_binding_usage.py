@@ -8,6 +8,7 @@ import re
 
 function_names = []
 
+
 def extract_function_names():
     for filename in os.listdir("src/map/lua/"):
         full_filename = os.path.join("src/map/lua/", filename)
@@ -16,6 +17,7 @@ def extract_function_names():
                 for line in file.readlines():
                     if 'SOL_REGISTER("' in line:
                         function_names.append(line.strip().split('"')[1])
+
 
 def main():
     extract_function_names()
@@ -27,7 +29,7 @@ def main():
 
     function_names.append("skip_to_next")
 
-    # Add exceptions for interaction and battle frameworks
+    # Add exceptions for interaction, battle frameworks, and other user Lua types
     function_names.append("new")
     function_names.append("event")
     function_names.append("begin")
@@ -56,8 +58,8 @@ def main():
     function_names.append("onZoneIn")
     function_names.append("noAction")
     function_names.append("onZoneOut")
-    function_names.append("onRegionEnter")
-    function_names.append("onRegionLeave")
+    function_names.append("onTriggerAreaEnter")
+    function_names.append("onTriggerAreaLeave")
     function_names.append("onEventFinish")
     function_names.append("onEventUpdate")
     function_names.append("sequence")
@@ -76,7 +78,6 @@ def main():
     function_names.append("onBattlefieldLoss")
     function_names.append("onBattlefieldWipe")
     function_names.append("handleWipe")
-    function_names.append("needsToZone")
     function_names.append("unsetVarBit")
     function_names.append("addVar")
     function_names.append("getLocaLVar")
@@ -87,6 +88,14 @@ def main():
     function_names.append("closeDoors")
     function_names.append("check")
     function_names.append("face")
+    function_names.append("startFunc")
+    function_names.append("enableCheck")
+    function_names.append("endFunc")
+    function_names.append("checkEnding")
+    function_names.append("checkStarting")
+    function_names.append("setEnableCheck")
+    function_names.append("setStartFunction")
+    function_names.append("setEndFunction")
 
     # root_dir needs a trailing slash (i.e. /root/dir/)
     for filename in glob.iglob("./scripts/" + "**/*.lua", recursive=True):
@@ -119,11 +128,15 @@ def main():
                     line = line.replace("\n", "")
 
                     for match in re.finditer('(?<=:)[^\(\/\\\: "]*', line):
-                        if len(match.group()) > 1 and match.group() not in function_names:
+                        if (
+                            len(match.group()) > 1
+                            and match.group() not in function_names
+                        ):
                             filename = filename.replace("\\", "/")
                             print(
                                 f"Could not find function match for {match.group()} ({filename}:{counter}:{match.start() + 1})"
                             )
+
 
 if __name__ == "__main__":
     main()

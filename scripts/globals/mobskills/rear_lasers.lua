@@ -8,10 +8,11 @@ require("scripts/globals/mobskills")
 -----------------------------------
 local mobskillObject = {}
 
-mobskillObject.onMobSkillCheck = function(target,mob,skill)
+mobskillObject.onMobSkillCheck = function(target, mob, skill)
     if target:isBehind(mob) then
         return 0
     end
+
     return 1
 end
 
@@ -22,4 +23,5 @@ mobskillObject.onMobWeaponSkill = function(target, mob, skill)
 
     return typeEffect
 end
+
 return mobskillObject

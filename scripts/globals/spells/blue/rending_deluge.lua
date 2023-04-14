@@ -1,7 +1,7 @@
 -----------------------------------
 -- Spell: Rending Deluge
 -- Spell cost: 118 MP
--- Monster Type: Craklaw
+-- Monster Type: Aquans
 -- Spell Type: Magical (Water)
 -- Blue Magic Points: 6
 -- Stat Bonus: VIT+6
@@ -23,10 +23,12 @@ end
 
 spellObject.onSpellCast = function(caster, target, spell)
     local multi = 1.0
-    if (caster:hasStatusEffect(xi.effect.AZURE_LORE)) then
+    if caster:hasStatusEffect(xi.effect.AZURE_LORE) then
         multi = multi + 1.50
     end
+
     local params = {}
+    params.ecosystem = xi.ecosystem.AQUAN
     params.attackType = xi.attackType.MAGICAL
     params.damageType = xi.damageType.WATER
     params.attribute = xi.mod.INT
@@ -44,14 +46,11 @@ spellObject.onSpellCast = function(caster, target, spell)
     params.chr_wsc = 0.0
 
     local resist = applyResistance(caster, target, spell, params)
-    if (resist > 0.0625) then
+    if resist > 0.0625 then
         target:dispelStatusEffect()
     end
 
-    local damage = BlueMagicalSpell(caster, target, spell, params, INT_BASED)
-    damage = BlueFinalAdjustments(caster, target, spell, damage, params)
-
-    return damage
+    return xi.spells.blue.useMagicalSpell(caster, target, spell, params)
 end
 
 return spellObject

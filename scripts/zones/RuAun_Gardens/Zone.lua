@@ -12,7 +12,7 @@ local zoneObject = {}
 
 zoneObject.onInitialize = function(zone)
     for k, v in pairs(ID.npc.PORTALS) do
-        zone:registerRegion(k, unpack(v["coords"]))
+        zone:registerTriggerArea(k, unpack(v["coords"]))
     end
 
     xi.treasure.initZone(zone)
@@ -31,14 +31,14 @@ zoneObject.onZoneIn = function(player, prevZone)
         player:getYPos() == 0 and
         player:getZPos() == 0
     then
-        player:setPos(333.017, -44.896, -458.35, 164)
+        player:setPos(-1, -55, -637, 193)
     end
 
     return cs
 end
 
-zoneObject.onRegionEnter = function(player, region)
-    local p = ID.npc.PORTALS[region:GetRegionID()]
+zoneObject.onTriggerAreaEnter = function(player, triggerArea)
+    local p = ID.npc.PORTALS[triggerArea:GetTriggerAreaID()]
 
     -- Disable yellow teleporters to God Islands when Gods are spawned. https://www.bg-wiki.com/ffxi/Ru%27Aun_Gardens
     if p["genbu"] ~= nil and GetMobByID(ID.mob.GENBU):isAlive() then
@@ -77,14 +77,14 @@ zoneObject.onRegionEnter = function(player, region)
 
     elseif type(p["event"]) == "table" then -- portal with random destination
         local events = p["event"]
-        player:startOptionalCutscene(events[math.random(#events)])
+        player:startOptionalCutscene(events[math.random(1, #events)])
 
     else -- portal with static destination
         player:startOptionalCutscene(p["event"])
     end
 end
 
-zoneObject.onRegionLeave = function(player, region)
+zoneObject.onTriggerAreaLeave = function(player, triggerArea)
 end
 
 zoneObject.onEventUpdate = function(player, csid, option)

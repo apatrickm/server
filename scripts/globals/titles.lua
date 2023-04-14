@@ -1,7 +1,5 @@
 -----------------------------------
---
---     TITLES IDs
---
+-- Title IDs
 -----------------------------------
 xi = xi or {}
 
@@ -1099,6 +1097,8 @@ xi.title =
     PARTER_OF_THE_VEIL                        = 1143,
     DEMONIC_DREAMER                           = 1144,
     SEARCHER_OF_THE_VORACIOUS                 = 1145,
+    ANOTHER_PSYCHE                            = 1146,
+    SENDER_OF_SHADOW                          = 1147,
 }
 
 -----------------------------------

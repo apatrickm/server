@@ -42,6 +42,7 @@ local function pickSetPoint(instance)
         for i = xi.nyzul.objective.ELIMINATE_ENEMY_LEADER, xi.nyzul.objective.ELIMINATE_ALL_ENEMIES do
             table.insert(objective, i)
         end
+
         -- Only remove objectives if not the staging room or free floor
         if instance:getStage() ~= 0 and instance:getStage() ~= 6 then
             table.remove(objective, instance:getStage())
@@ -94,7 +95,7 @@ end
 local function lampsActivate(instance)
     local floorLayout    = instance:getLocalVar("Nyzul_Isle_FloorLayout")
     local lampsObjective = instance:getLocalVar("[Lamps]Objective")
-    local runicLamp_1    = GetNPCByID(ID.npc.RUNIC_LAMP_1, instance)
+    local runicLamp1     = GetNPCByID(ID.npc.RUNIC_LAMP_OFFSET, instance)
     local partySize      = utils.clamp(instance:getLocalVar("partySize"), 3, 5)
     local lampPoints     = {}
 
@@ -107,20 +108,22 @@ local function lampsActivate(instance)
         local spawnPoint = math.random(1, #lampPoints)
 
         instance:setLocalVar("[Lamp]PartySize", instance:getLocalVar("partySize"))
-        runicLamp_1:setPos(lampPoints[spawnPoint])
-        runicLamp_1:setStatus(xi.status.NORMAL)
+        runicLamp1:setPos(lampPoints[spawnPoint])
+        runicLamp1:setStatus(xi.status.NORMAL)
+
     -- Lamp Objective: Activate All
     elseif lampsObjective == xi.nyzul.lampsObjective.ACTIVATE_ALL then
         local runicLamps = math.random(2, partySize - 1)
         instance:setLocalVar("[Lamp]count", runicLamps)
 
-        for i = ID.npc.RUNIC_LAMP_1, ID.npc.RUNIC_LAMP_1 + runicLamps do
+        for i = ID.npc.RUNIC_LAMP_OFFSET, ID.npc.RUNIC_LAMP_OFFSET + runicLamps do
             local spawnPoint = math.random(1, #lampPoints)
 
             GetNPCByID(i, instance):setPos(lampPoints[spawnPoint])
             GetNPCByID(i, instance):setStatus(xi.status.NORMAL)
             table.remove(lampPoints, spawnPoint)
         end
+
     -- Lamp Objective: Activate in Order
     elseif lampsObjective == xi.nyzul.lampsObjective.ORDER then
         local runicLamps = math.random(2, 4)
@@ -133,7 +136,7 @@ local function lampsActivate(instance)
         instance:setLocalVar("[Lamp]count", runicLamps)
         instance:setLocalVar("[Lamp]lampRegister", 0)
 
-        for i = ID.npc.RUNIC_LAMP_1, ID.npc.RUNIC_LAMP_1 + runicLamps do
+        for i = ID.npc.RUNIC_LAMP_OFFSET, ID.npc.RUNIC_LAMP_OFFSET + runicLamps do
             local spawnPoint = math.random(1, #lampPoints)
             local lampRandom = math.random(1, #lampOrder)
 
@@ -362,7 +365,10 @@ local function pickMobs(instance)
 
                 if instance:getStage() == xi.nyzul.objective.ELIMINATE_ALL_ENEMIES then
                     instance:setLocalVar("Eliminate", instance:getLocalVar("Eliminate") + 1)
-                elseif instance:getStage() == xi.nyzul.objective.ELIMINATE_SPECIFIED_ENEMY and instance:getLocalVar("Nyzul_Specified_Enemy") == 0 then
+                elseif
+                    instance:getStage() == xi.nyzul.objective.ELIMINATE_SPECIFIED_ENEMY and
+                    instance:getLocalVar("Nyzul_Specified_Enemy") == 0
+                then
                     instance:setLocalVar("Nyzul_Specified_Enemy", enemy)
                 end
 

@@ -5,16 +5,19 @@
 -- Recast Time: 1:00
 -- Duration: 2:00:00
 -----------------------------------
-require("scripts/globals/settings")
-require("scripts/globals/status")
 require("scripts/globals/msg")
+require("scripts/globals/status")
 -----------------------------------
 local abilityObject = {}
 
 abilityObject.onAbilityCheck = function(player, target, ability)
-    if player:hasStatusEffect(xi.effect.DARK_ARTS) or player:hasStatusEffect(xi.effect.ADDENDUM_BLACK) then
+    if
+        player:hasStatusEffect(xi.effect.DARK_ARTS) or
+        player:hasStatusEffect(xi.effect.ADDENDUM_BLACK)
+    then
         return xi.msg.basic.EFFECT_ALREADY_ACTIVE, 0
     end
+
     return 0, 0
 end
 
@@ -30,7 +33,8 @@ abilityObject.onUseAbility = function(player, target, ability)
     player:delStatusEffect(xi.effect.PERPETUANCE)
 
     local helixbonus = 0
-    if (player:getMainJob() == xi.job.SCH and player:getMainLvl() >= 20) then
+
+    if player:getMainJob() == xi.job.SCH and player:getMainLvl() >= 20 then
         helixbonus = math.floor(player:getMainLvl() / 4)
     end
 

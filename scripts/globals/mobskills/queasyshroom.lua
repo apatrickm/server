@@ -15,9 +15,10 @@ require("scripts/globals/mobskills")
 local mobskillObject = {}
 
 mobskillObject.onMobSkillCheck = function(target, mob, skill)
-    if (mob:getMobMod(xi.mobMod.VAR) == 0) then
+    if mob:getMobMod(xi.mobMod.VAR) == 0 then
         return 0
     end
+
     return 1
 end
 

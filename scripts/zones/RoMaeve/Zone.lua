@@ -21,14 +21,18 @@ end
 zoneObject.onZoneIn = function(player, prevZone)
     local cs = -1
 
-    if player:getXPos() == 0 and player:getYPos() == 0 and player:getZPos() == 0 then
+    if
+        player:getXPos() == 0 and
+        player:getYPos() == 0 and
+        player:getZPos() == 0
+    then
         player:setPos(-0.008, -33.595, 123.478, 62)
     end
 
     return cs
 end
 
-zoneObject.onRegionEnter = function(player, region)
+zoneObject.onTriggerAreaEnter = function(player, triggerArea)
 end
 
 zoneObject.onGameHour = function(zone)
@@ -44,6 +48,7 @@ zoneObject.onGameHour = function(zone)
             for i = ID.npc.MOONGATE_OFFSET, ID.npc.MOONGATE_OFFSET + 7 do
                 GetNPCByID(i):setAnimation(xi.anim.OPEN_DOOR) -- Open them
             end
+
             moongate2:setUntargetable(true)
             moongate1:setUntargetable(true)
             moongate1:setLocalVar("romaeveActive", 1) -- Make this loop unavailable after firing
@@ -58,6 +63,7 @@ zoneObject.onGameHour = function(zone)
             for i = ID.npc.MOONGATE_OFFSET, ID.npc.MOONGATE_OFFSET + 7 do
                 GetNPCByID(i):setAnimation(xi.anim.CLOSE_DOOR)
             end
+
             moongate2:setUntargetable(false)
             moongate1:setUntargetable(false)
             moongate1:setLocalVar("romaeveActive", 0) -- Make loop available again

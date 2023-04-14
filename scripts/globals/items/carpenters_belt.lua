@@ -14,9 +14,10 @@ local itemObject = {}
 
 itemObject.onItemCheck = function(target)
     local result = 0
-    if (target:hasStatusEffect(xi.effect.WOODWORKING_IMAGERY) == true) then
+    if target:hasStatusEffect(xi.effect.WOODWORKING_IMAGERY) then
         result = 236
     end
+
     return result
 end
 

@@ -5,7 +5,6 @@
 -- Recast Time: 5:00
 -- Duration: 3:00
 -----------------------------------
-require("scripts/globals/status")
 require("scripts/globals/job_utils/rune_fencer")
 -----------------------------------
 local abilityObject = {}
@@ -15,7 +14,7 @@ abilityObject.onAbilityCheck = function(player, target, ability)
 end
 
 abilityObject.onUseAbility = function(player, target, ability, action)
-   return xi.job_utils.rune_fencer.useVallationValiance(player, target, ability, action)
+    return xi.job_utils.rune_fencer.useVallationValiance(player, target, ability, action)
 end
 
 return abilityObject

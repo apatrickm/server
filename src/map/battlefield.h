@@ -125,6 +125,7 @@ struct BattlefieldGroup
     sol::function       deathCallback;
     sol::function       randomDeathCallback;
     sol::function       allDeathCallback;
+    sol::function       setupCallback;
     uint8               deathCount  = 0;
     uint32              randomMobId = 0;
 };
@@ -161,6 +162,7 @@ public:
     bool CheckInProgress();
     bool IsOccupied() const;
     bool isInteraction() const;
+    bool isEntered(CCharEntity* PChar) const;
 
     void ForEachPlayer(const std::function<void(CCharEntity*)>& func);
     void ForEachEnemy(const std::function<void(CMobEntity*)>& func);
@@ -187,7 +189,6 @@ public:
     void setArmouryCrate(uint32 entityId);
 
     void         ApplyLevelRestrictions(CCharEntity* PChar) const;
-    void         ClearEnmityForEntity(CBattleEntity* PEntity);
     bool         InsertEntity(CBaseEntity* PEntity, bool inBattlefield = false, BATTLEFIELDMOBCONDITION conditions = CONDITION_NONE, bool ally = false);
     CBaseEntity* GetEntity(CBaseEntity* PEntity);
     bool         IsRegistered(CCharEntity* PChar);
@@ -201,6 +202,11 @@ public:
     // Groups
     void addGroup(BattlefieldGroup group);
     void handleDeath(CBaseEntity* PEntity);
+
+    static void setPlayerEntered(CCharEntity* PChar, bool entered);
+    static bool hasPlayerEntered(CCharEntity* PChar);
+
+    static uint16 getBattlefieldArea(CCharEntity* PChar);
 
     uint8 m_isMission;
     bool  m_showTimer = true;

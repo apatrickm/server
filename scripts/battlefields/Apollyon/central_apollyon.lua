@@ -27,7 +27,6 @@ local content = Limbus:new({
     entryNpc         = '_12i',
     requiredKeyItems = { xi.ki.COSMO_CLEANSE, { xi.ki.RED_CARD, xi.ki.BLACK_CARD }, message = ID.text.YOU_INSERT_THE_CARD_POLISHED },
     requiredItems    = { xi.items.SMALT_CHIP, xi.items.SMOKY_CHIP, xi.items.CHARCOAL_CHIP, xi.items.MAGENTA_CHIP },
-    title            = xi.title.APOLLYON_RAVAGER,
     name             = "CENTRAL_APOLLYON",
 })
 
@@ -69,20 +68,20 @@ content.loot =
     {
         {
             quantity = 5,
-            { itemid = xi.items.ANCIENT_BEASTCOIN, droprate = xi.battlefield.dropChance.NORMAL },
+            { item = xi.items.ANCIENT_BEASTCOIN, weight = xi.loot.weight.NORMAL },
         },
 
         {
             quantity = 2,
-            { itemid = xi.items.PIECE_OF_OMEGAS_EYE, droprate = xi.battlefield.dropChance.NORMAL },
-            { itemid = xi.items.SEGMENT_OF_OMEGAS_FORELEG, droprate = xi.battlefield.dropChance.LOW },
-            { itemid = xi.items.SEGMENT_OF_OMEGAS_HIND_LEG, droprate = xi.battlefield.dropChance.LOW },
-            { itemid = xi.items.SEGMENT_OF_OMEGAS_TAIL, droprate = xi.battlefield.dropChance.LOW },
+            { item = xi.items.PIECE_OF_OMEGAS_EYE, weight = xi.loot.weight.NORMAL },
+            { item = xi.items.SEGMENT_OF_OMEGAS_FORELEG, weight = xi.loot.weight.LOW },
+            { item = xi.items.SEGMENT_OF_OMEGAS_HIND_LEG, weight = xi.loot.weight.LOW },
+            { item = xi.items.SEGMENT_OF_OMEGAS_TAIL, weight = xi.loot.weight.LOW },
         },
 
         {
-            { itemid = xi.items.NONE, droprate = xi.battlefield.dropChance.EXTREMELY_HIGH },
-            { itemid = xi.items.PIECE_OF_OMEGAS_HEART, droprate = xi.battlefield.dropChance.NORMAL },
+            { item = xi.items.NONE, weight = xi.loot.weight.EXTREMELY_HIGH },
+            { item = xi.items.PIECE_OF_OMEGAS_HEART, weight = xi.loot.weight.NORMAL },
         },
     },
 }

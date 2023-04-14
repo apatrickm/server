@@ -1,7 +1,7 @@
 -----------------------------------
 -- Zone: Residential_Area
 -----------------------------------
-local ID = require('scripts/zones/Residential_Area/IDs')
+require('scripts/globals/moghouse')
 -----------------------------------
 local zoneObject = {}
 
@@ -9,15 +9,10 @@ zoneObject.onInitialize = function(zone)
 end
 
 zoneObject.onZoneIn = function(player, prevZone)
-    local cs = -1
-
-    player:eraseStatusEffect(true)
-    player:setPos(0, 0, 0, 192)
-
-    return cs
+    return xi.moghouse.onMoghouseZoneIn(player, prevZone)
 end
 
-zoneObject.onRegionEnter = function(player, region)
+zoneObject.onTriggerAreaEnter = function(player, triggerArea)
 end
 
 zoneObject.onEventUpdate = function(player, csid, option)

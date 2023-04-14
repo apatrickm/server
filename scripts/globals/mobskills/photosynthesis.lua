@@ -16,14 +16,15 @@ local mobskillObject = {}
 mobskillObject.onMobSkillCheck = function(target, mob, skill)
     -- only used during daytime
     local currentTime = VanadielHour()
-    if (currentTime >= 6 and currentTime <= 18) then
+    if currentTime >= 6 and currentTime <= 18 then
         return 0
     end
+
     return 1
 end
 
 mobskillObject.onMobWeaponSkill = function(target, mob, skill)
-    local power = mob:getMainLvl()/10 * 4 + 5
+    local power = mob:getMainLvl() / 10 * 4 + 5
     local duration = 30
 
     local typeEffect = xi.effect.REGEN

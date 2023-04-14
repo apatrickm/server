@@ -3,6 +3,7 @@
 -- Dream Hat +1
 -- Dispenses Ginger Cookies
 -----------------------------------
+require("scripts/globals/items")
 require("scripts/globals/msg")
 -----------------------------------
 local itemObject = {}
@@ -12,11 +13,12 @@ itemObject.onItemCheck = function(target)
     if target:getFreeSlotsCount() == 0 then
         result = xi.msg.basic.ITEM_NO_USE_INVENTORY
     end
+
     return result
 end
 
 itemObject.onItemUse = function(target)
-    target:addItem(4394, math.random(1, 10))
+    target:addItem(xi.items.GINGER_COOKIE, math.random(1, 10))
 end
 
 return itemObject

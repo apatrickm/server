@@ -9,7 +9,7 @@
 
 local mobskillObject = {}
 
-mobskillObject.onMobSkillCheck = function(target,mob,skill)
+mobskillObject.onMobSkillCheck = function(target, mob, skill)
     return 0
 end
 
@@ -22,6 +22,7 @@ mobskillObject.onMobWeaponSkill = function(target, mob, skill)
             gunpod:updateEnmity(utils.randomEntry(mob:getBattlefield():getPlayers()))
         end
     end)
+
     skill:setMsg(0)
     return 0
 end

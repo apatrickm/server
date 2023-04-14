@@ -14,20 +14,20 @@ require("scripts/globals/mobskills")
 local mobskillObject = {}
 
 mobskillObject.onMobSkillCheck = function(target, mob, skill)
-  if(mob:getFamily() == 91) then
-    local mobSkin = mob:getModelId()
+    if mob:getFamily() == 91 then
+        local mobSkin = mob:getModelId()
 
-    if (mobSkin == 1680) then
-        return 0
-    else
-        return 1
+        if mobSkin == 1680 then
+            return 0
+        else
+            return 1
+        end
     end
-  end
+
     return 0
 end
 
 mobskillObject.onMobWeaponSkill = function(target, mob, skill)
-
     local numhits = 1
     local accmod = 2
     local dmgmod = 3
@@ -35,7 +35,7 @@ mobskillObject.onMobWeaponSkill = function(target, mob, skill)
     local dmg = xi.mobskills.mobFinalAdjustments(info.dmg, mob, skill, target, xi.attackType.PHYSICAL, xi.damageType.BLUNT, info.hitslanded)
 
     local typeEffect = xi.effect.PETRIFICATION
-    local power = math.random(25, 40) + mob:getMainLvl()/3
+    local power = math.random(25, 40) + mob:getMainLvl() / 3
 
     xi.mobskills.mobPhysicalStatusEffectMove(mob, target, skill, typeEffect, 1, 0, power)
 

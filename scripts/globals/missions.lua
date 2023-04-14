@@ -677,7 +677,7 @@ xi.mission.id =
 -- None yet!
 
 local function rankPointMath(rank)
-    return 0.372*rank^2 - 1.62*rank + 6.2
+    return 0.372 * rank^2 - 1.62 * rank + 6.2
 end
 
 xi.mission.getMissionRankPoints = function(player, missionID)
@@ -704,9 +704,9 @@ xi.mission.getMissionRankPoints = function(player, missionID)
         crystals = 0
     end
 
-    local points_needed = 1024 * (crystals-.25) / (3*rankPointMath(player:getRank(player:getNation())))
+    local pointsNeeded = 1024 * (crystals - 0.25) / (3 * rankPointMath(player:getRank(player:getNation())))
 
-    if player:getRankPoints() >= points_needed then
+    if player:getRankPoints() >= pointsNeeded then
         return true
     end
 

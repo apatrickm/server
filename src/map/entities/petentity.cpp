@@ -42,14 +42,19 @@
 
 CPetEntity::CPetEntity(PET_TYPE petType)
 : CMobEntity()
+, m_PetID(0)
 , m_PetType(petType)
+, m_spawnLevel(0)
+, m_jugSpawnTime(time_point::min())
+, m_jugDuration(duration::min())
 {
-    objtype        = TYPE_PET;
-    m_EcoSystem    = ECOSYSTEM::UNCLASSIFIED;
-    allegiance     = ALLEGIANCE_TYPE::PLAYER;
-    m_MobSkillList = 0;
-    m_PetID        = 0;
-    m_IsClaimable  = false;
+    objtype                     = TYPE_PET;
+    m_EcoSystem                 = ECOSYSTEM::UNCLASSIFIED;
+    allegiance                  = ALLEGIANCE_TYPE::PLAYER;
+    m_MobSkillList              = 0;
+    m_IsClaimable               = false;
+    m_bReleaseTargIDOnDisappear = true;
+    spawnAnimation              = SPAWN_ANIMATION::SPECIAL; // Initial spawn has the special spawn-in animation
 
     PAI = std::make_unique<CAIContainer>(this, std::make_unique<CPathFind>(this), std::make_unique<CPetController>(this), std::make_unique<CTargetFind>(this));
 }
@@ -61,12 +66,51 @@ PET_TYPE CPetEntity::getPetType()
     return m_PetType;
 }
 
+uint8 CPetEntity::getSpawnLevel()
+{
+    return m_spawnLevel;
+}
+
+void CPetEntity::setSpawnLevel(uint8 level)
+{
+    m_spawnLevel = level;
+}
+
 bool CPetEntity::isBstPet()
 {
     return getPetType() == PET_TYPE::JUG_PET || objtype == TYPE_MOB;
 }
 
-std::string CPetEntity::GetScriptName()
+int32 CPetEntity::getJugSpawnTime()
+{
+    XI_DEBUG_BREAK_IF(m_PetType != PET_TYPE::JUG_PET)
+
+    const auto epoch = m_jugSpawnTime.time_since_epoch();
+    return static_cast<int32>(std::chrono::duration_cast<std::chrono::seconds>(epoch).count());
+}
+
+void CPetEntity::setJugSpawnTime(int32 spawnTime)
+{
+    XI_DEBUG_BREAK_IF(m_PetType != PET_TYPE::JUG_PET);
+
+    m_jugSpawnTime = std::chrono::system_clock::time_point(std::chrono::duration<int>(spawnTime));
+}
+
+int32 CPetEntity::getJugDuration()
+{
+    XI_DEBUG_BREAK_IF(m_PetType != PET_TYPE::JUG_PET);
+
+    return static_cast<int32>(std::chrono::duration_cast<std::chrono::seconds>(m_jugDuration).count());
+}
+
+void CPetEntity::setJugDuration(int32 seconds)
+{
+    XI_DEBUG_BREAK_IF(m_PetType != PET_TYPE::JUG_PET);
+
+    m_jugDuration = std::chrono::seconds(seconds);
+}
+
+const std::string CPetEntity::GetScriptName()
 {
     switch (getPetType())
     {
@@ -161,7 +205,17 @@ void CPetEntity::FadeOut()
 void CPetEntity::Die()
 {
     PAI->ClearStateStack();
-    PAI->Internal_Die(0s);
+
+    // master is zoning, don't go to death state, instead despawn instantly
+    if (health.hp > 0 && PMaster && PMaster->objtype == TYPE_PC && static_cast<CCharEntity*>(PMaster)->petZoningInfo.respawnPet)
+    {
+        PAI->Internal_Despawn(true);
+    }
+    else
+    {
+        PAI->Internal_Die(2500ms);
+    }
+
     luautils::OnMobDeath(this, nullptr);
 
     // NOTE: This is purposefully calling CBattleEntity's impl.
@@ -183,10 +237,54 @@ void CPetEntity::Spawn()
         mobutils::GetAvailableSpells(this);
     }
 
+    if (m_PetType == PET_TYPE::JUG_PET)
+    {
+        m_jugSpawnTime = server_clock::now();
+    }
+
     // NOTE: This is purposefully calling CBattleEntity's impl.
     // TODO: Calling a grand-parent's impl. of an overridden function is bad
     CBattleEntity::Spawn();
     luautils::OnMobSpawn(this);
+}
+
+bool CPetEntity::shouldDespawn(time_point tick)
+{
+    // This check was moved from the original call site when this method was added.
+    // It is in theory not needed, but we are not removing it without further testing.
+    // TODO: Consider removing this when possible.
+    if (isCharmed && tick > charmTime)
+    {
+        return true;
+    }
+
+    if (PMaster != nullptr &&
+        PAI->IsSpawned() &&
+        m_PetType == PET_TYPE::JUG_PET &&
+        tick > m_jugSpawnTime + m_jugDuration)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void CPetEntity::loadPetZoningInfo()
+{
+    XI_DEBUG_BREAK_IF(!PAI->IsSpawned())
+
+    if (auto* master = dynamic_cast<CCharEntity*>(PMaster))
+    {
+        health.tp = static_cast<uint16>(master->petZoningInfo.petTP);
+        health.hp = master->petZoningInfo.petHP;
+        health.mp = master->petZoningInfo.petMP;
+
+        if (m_PetType == PET_TYPE::JUG_PET)
+        {
+            setJugDuration(master->petZoningInfo.jugDuration);
+            setJugSpawnTime(master->petZoningInfo.jugSpawnTime);
+        }
+    }
 }
 
 void CPetEntity::OnAbility(CAbilityState& state, action_t& action)
@@ -202,7 +300,9 @@ void CPetEntity::OnAbility(CAbilityState& state, action_t& action)
             return;
         }
 
-        if (battleutils::IsParalyzed(this))
+        // Currently, only the Wyvern uses abilities at all as of writing, but their abilities are not instant and are mob abilities.
+        // Abilities are not subject to paralyze if they have non-zero cast time due to this corner case.
+        if (state.GetAbility()->getCastTime() == 0s && battleutils::IsParalyzed(this))
         {
             setActionInterrupted(action, PTarget, MSGBASIC_IS_PARALYZED_2, 0);
             return;
@@ -276,6 +376,11 @@ void CPetEntity::OnPetSkillFinished(CPetSkillState& state, action_t& action)
     if (PSkill->getValidTargets() == TARGET_SELF)
     {
         findFlags |= FINDFLAGS_PET;
+    }
+
+    if ((PSkill->getValidTargets() & TARGET_IGNORE_BATTLEID) == TARGET_IGNORE_BATTLEID)
+    {
+        findFlags |= FINDFLAGS_IGNORE_BATTLEID;
     }
 
     action.id         = id;
@@ -446,7 +551,12 @@ void CPetEntity::OnPetSkillFinished(CPetSkillState& state, action_t& action)
                 first = false;
             }
         }
-        PTargetFound->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_DETECTABLE);
+
+        if (PSkill->getValidTargets() & TARGET_ENEMY)
+        {
+            PTargetFound->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_DETECTABLE);
+        }
+
         if (PTargetFound->isDead())
         {
             battleutils::ClaimMob(PTargetFound, this);

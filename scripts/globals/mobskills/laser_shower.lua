@@ -17,12 +17,13 @@ mobskillObject.onMobSkillCheck = function(target, mob, skill)
     if target:isBehind(mob, 48) then
         return 1
     end
+
     return 0
 end
 
 mobskillObject.onMobWeaponSkill = function(target, mob, skill)
     local dmgmod = xi.mobskills.mobBreathMove(mob, target, 0.2, 1.25, xi.magic.ele.LIGHT, 1600)
-    local dis = ((mob:checkDistance(target)*2) / 20)
+    local dis = ((mob:checkDistance(target) * 2) / 20)
 
     dmgmod = dmgmod * dis
     dmgmod = utils.clamp(dmgmod, 50, 1600)

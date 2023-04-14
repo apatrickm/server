@@ -45,13 +45,15 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 CTrustEntity::CTrustEntity(CCharEntity* PChar)
 : CMobEntity()
 {
-    objtype        = TYPE_TRUST;
-    m_EcoSystem    = ECOSYSTEM::UNCLASSIFIED;
-    allegiance     = ALLEGIANCE_TYPE::PLAYER;
-    m_MobSkillList = 0;
-    PMaster        = PChar;
-    m_MovementType = MELEE_RANGE;
-    m_IsClaimable  = false;
+    objtype                     = TYPE_TRUST;
+    m_EcoSystem                 = ECOSYSTEM::UNCLASSIFIED;
+    allegiance                  = ALLEGIANCE_TYPE::PLAYER;
+    m_MobSkillList              = 0;
+    PMaster                     = PChar;
+    m_MovementType              = MELEE_RANGE;
+    m_IsClaimable               = false;
+    m_bReleaseTargIDOnDisappear = true;
+    spawnAnimation              = SPAWN_ANIMATION::SPECIAL; // Initial spawn has the special spawn-in animation
 
     PAI = std::make_unique<CAIContainer>(this, std::make_unique<CPathFind>(this), std::make_unique<CTrustController>(PChar, this),
                                          std::make_unique<CTargetFind>(this));
@@ -115,7 +117,11 @@ void CTrustEntity::Spawn()
 void CTrustEntity::OnAbility(CAbilityState& state, action_t& action)
 {
     auto* PAbility = state.GetAbility();
-    auto* PTarget  = static_cast<CBattleEntity*>(state.GetTarget());
+    auto* PTarget  = dynamic_cast<CBattleEntity*>(state.GetTarget());
+    if (!PTarget)
+    {
+        return;
+    }
 
     std::unique_ptr<CBasicPacket> errMsg;
     if (IsValidTarget(PTarget->targid, PAbility->getValidTarget(), errMsg))
@@ -171,9 +177,11 @@ void CTrustEntity::OnAbility(CAbilityState& state, action_t& action)
 
                 if (value < 0)
                 {
-                    actionTarget.messageID = ability::GetAbsorbMessage(prevMsg);
+                    actionTarget.messageID = ability::GetAbsorbMessage(actionTarget.messageID);
                     actionTarget.param     = -actionTarget.param;
                 }
+
+                prevMsg = actionTarget.messageID;
 
                 state.ApplyEnmity();
             }
@@ -215,7 +223,11 @@ void CTrustEntity::OnAbility(CAbilityState& state, action_t& action)
 
 void CTrustEntity::OnRangedAttack(CRangeState& state, action_t& action)
 {
-    auto* PTarget = static_cast<CBattleEntity*>(state.GetTarget());
+    auto* PTarget = dynamic_cast<CBattleEntity*>(state.GetTarget());
+    if (!PTarget)
+    {
+        return;
+    }
 
     int32 damage      = 0;
     int32 totalDamage = 0;
@@ -514,7 +526,11 @@ void CTrustEntity::OnWeaponSkillFinished(CWeaponSkillState& state, action_t& act
     CBattleEntity::OnWeaponSkillFinished(state, action);
 
     auto* PWeaponSkill  = state.GetSkill();
-    auto* PBattleTarget = static_cast<CBattleEntity*>(state.GetTarget());
+    auto* PBattleTarget = dynamic_cast<CBattleEntity*>(state.GetTarget());
+    if (!PBattleTarget)
+    {
+        return;
+    }
 
     int16 tp = state.GetSpentTP();
     tp       = battleutils::CalculateWeaponSkillTP(this, PWeaponSkill, tp);

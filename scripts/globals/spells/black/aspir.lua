@@ -24,25 +24,25 @@ spellObject.onSpellCast = function(caster, target, spell)
     params.bonus = 1.0
     local resist = applyResistance(caster, target, spell, params)
     --get the resisted damage
-    dmg = dmg*resist
+    dmg = dmg * resist
     --add on bonuses (staff/day/weather/jas/mab/etc all go in this function)
     dmg = addBonuses(caster, spell, target, dmg)
     --add in target adjustment
     dmg = adjustForTarget(target, dmg, spell:getElement())
     --add in final adjustments
 
-    if (dmg < 0) then
+    if dmg < 0 then
         dmg = 0
     end
 
     dmg = dmg * xi.settings.main.DARK_POWER
 
-    if (target:isUndead()) then
+    if target:isUndead() then
         spell:setMsg(xi.msg.basic.MAGIC_NO_EFFECT) -- No effect
         return dmg
     end
 
-    if (target:getMP() > dmg) then
+    if target:getMP() > dmg then
         caster:addMP(dmg)
         target:delMP(dmg)
     else
