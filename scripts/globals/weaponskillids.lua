@@ -221,6 +221,7 @@ xi.weaponskill =
     FLASH_NOVA          = 172,
     DAGAN               = 173,
     REALMRAZER          = 174,
+	EXUDATION           = 175,
 
     -----------------------------------
     -- STAFF
@@ -332,4 +333,5 @@ xi.ws_unlock =
     JISHNUS_RADIANCE    = 47,
     WILDFIRE            = 48,
     DIMIDIATION         = 49,
+	EXUDATION           = 50,
 }
