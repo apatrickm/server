@@ -1,11 +1,13 @@
 -----------------------------------
 -- Altepa - Dominion Op #10
 -----------------------------------
--- !addquest 8 96
--- Dominion Sergeant (Excenmille's Camp)
+-----------------------------------
+require('scripts/globals/interaction/quest')
+require('scripts/globals/abyssea/dominion')
+require('scripts/globals/quests')
 -----------------------------------
 
-local quest = Quest:new(xi.questLog.ABYSSEA, xi.quest.id.abyssea.DOMINION_OP_10_ALTEPA)
+local quest = Quest:new(xi.quest.log_id.ABYSSEA, xi.quest.id.abyssea.DOMINION_OP_10_ALTEPA)
 
 quest.reward = {}
 
@@ -13,7 +15,7 @@ quest.sections =
 {
     {
         check = function(player, status, vars)
-            return status == xi.questStatus.QUEST_ACCEPTED
+            return status == QUEST_ACCEPTED
         end,
 
         [xi.zone.ABYSSEA_ALTEPA] =
